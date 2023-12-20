@@ -323,6 +323,8 @@ class Model(nn.Module):
         h = self.mid.block_1(h, temb)
         h = self.mid.attn_1(h)
         h = self.mid.block_2(h, temb)
+        h_mid = h
+        #print(h.shape)
 
         # upsampling
         for i_level in reversed(range(self.num_resolutions)):
@@ -338,4 +340,4 @@ class Model(nn.Module):
         h = self.norm_out(h)
         h = nonlinearity(h)
         h = self.conv_out(h)
-        return h
+        return h, h_mid
