@@ -22,6 +22,8 @@ def torch2hwcuint8(x, clip=False):
     if clip:
         x = torch.clamp(x, -1, 1)
     x = (x + 1.0) / 2.0
+
+    # change from -1,1 to 0,1
     return x
 
 
