@@ -97,6 +97,20 @@ class Diffusion(object):
         elif self.model_var_type == "fixedsmall":
             self.logvar = posterior_variance.clamp(min=1e-20).log()
 
+    def simple_load(self, model, device):
+        state_dict = torch.load('ckpt.pth', map_location=device)[0]
+        # create new OrderedDict that does not contain `module.`
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            name = k[7:] # remove `module.`
+            new_state_dict[name] = v
+        # load params
+        model.load_state_dict(new_state_dict)
+        model.to(device)
+
+        return model
+    
     def train(self):
         args, config = self.args, self.config
         tb_logger = self.config.tb_logger
@@ -225,7 +239,9 @@ class Diffusion(object):
             elif self.config.data.dataset == "LSUN":
                 name = f"lsun_{self.config.data.category}"
             else:
-                raise ValueError
+                #raise ValueError
+                pass
+            #ckpt = get_ckpt_path(f"ema_{name}")
             ckpt = get_ckpt_path(f"ema_{name}")
             print("Loading checkpoint {}".format(ckpt))
             model.load_state_dict(torch.load(ckpt, map_location=self.device))
